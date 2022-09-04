@@ -23,7 +23,7 @@ export class TodosAccess {
             TableName: this.todosTable,
             KeyConditionExpression: 'userId = :userId',
             ExpressionAttributeValues: {
-              'userId': userId
+              ':userId': userId
             },
             ScanIndexForward: false
         }).promise()
