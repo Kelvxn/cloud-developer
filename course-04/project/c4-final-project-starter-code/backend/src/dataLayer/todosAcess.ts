@@ -5,14 +5,15 @@ import { createLogger } from '../utils/logger'
 import { TodoItem } from '../models/TodoItem'
 import { TodoUpdate } from '../models/TodoUpdate';
 
-// const XAWS = AWSXRay.captureAWS(AWS)
 
+const AWSXRay = require('aws-xray-sdk')
+const XAWS = AWSXRay.captureAWS(AWS)
 const logger = createLogger('TodosAccess')
 
 // TODO: Implement the dataLayer logic
 export class TodosAccess {
     constructor(
-        private readonly docClient: DocumentClient = new AWS.DynamoDB.DocumentClient(),
+        private readonly docClient: DocumentClient = new XAWS.DynamoDB.DocumentClient(),
         private readonly todosTable = process.env.TODOS_TABLE,
     ) {
     }
@@ -23,7 +24,7 @@ export class TodosAccess {
             TableName: this.todosTable,
             KeyConditionExpression: 'userId = :userId',
             ExpressionAttributeValues: {
-              'userId': userId
+              ':userId': userId
             },
             ScanIndexForward: false
         }).promise()
