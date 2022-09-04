@@ -25,11 +25,11 @@ provider:
     apiGateway: true
 
   # Use these variables in the functions and resources section below. For example, 
-  # ${self:provider.environment.TODOS_S3_BUCKET}
+  # ${self:provider.environment.ATTACHMENT_S3_BUCKET}
   environment:
     TODOS_TABLE: Todos-${self:provider.stage}
     TODOS_CREATED_AT_INDEX: CreatedAtIndex
-    TODOS_S3_BUCKET: serverless-c4-todo-images-${self:provider.stage}
+    ATTACHMENT_S3_BUCKET: serverless-todo-xd-bucket-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
 
   logs:
@@ -157,7 +157,7 @@ functions:
       - Effect: Allow
         Action: 
           - s3:*
-        Resource: arn:aws:s3:::${self:provider.environment.TODOS_S3_BUCKET}
+        Resource: arn:aws:s3:::${self:provider.environment.ATTACHMENT_S3_BUCKET}/*
             
 
 
@@ -210,7 +210,7 @@ resources:
     AttachmentsBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:provider.environment.TODOS_S3_BUCKET}
+        BucketName: ${self:provider.environment.ATTACHMENT_S3_BUCKET}
         CorsConfiguration:
           CorsRules:
             - 
@@ -239,5 +239,5 @@ resources:
               Effect: Allow
               Principal: '*'
               Action: 's3:GetObject'
-              Resource: 'arn:aws:s3:::${self:provider.environment.TODOS_S3_BUCKET}/*'
+              Resource: 'arn:aws:s3:::${self:provider.environment.ATTACHMENT_S3_BUCKET}/*'
         Bucket: !Ref AttachmentsBucket
