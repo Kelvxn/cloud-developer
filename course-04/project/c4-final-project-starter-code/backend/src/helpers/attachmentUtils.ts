@@ -8,16 +8,18 @@ const XAWS = AWSXRay.captureAWS(AWS)
 export class AttachmentUtils {
     constructor(
             private readonly s3Client = new XAWS.S3({ signatureVersion: 'v4' }),
-            private readonly s3BucketName = process.env.S3_BUCKET_NAME
+            private readonly bucketName = process.env.S3_BUCKET_NAME,
+            private readonly urlExpiration = process.env.SIGNED_URL_EXPIRATION
+
         ) {
     }
 
     async generateUploadUrl(todoId: string): Promise<string> {
 
         const url = this.s3Client.getSignedUrl('putObject', {
-            Bucket: this.s3BucketName,
+            Bucket: this.bucketName,
             Key: todoId,
-            Expires: 1500,
+            Expires: this.urlExpiration,
         });
 
         return url;

@@ -3,10 +3,10 @@ import { AttachmentUtils } from './attachmentUtils';
 import { TodoItem } from '../models/TodoItem'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
-import { createLogger } from '../utils/logger'
+// import { createLogger } from '../utils/logger'
 
 import * as uuid from 'uuid'
-import * as createError from 'http-errors'
+// import * as createError from 'http-errors'
 
 
 // TODO: Implement businessLogic
@@ -20,10 +20,13 @@ export async function getTodosForUser(userId: string): Promise<TodoItem[]> {
 export async function createTodo(createTodoRequest: CreateTodoRequest, userId: string): Promise<TodoItem> {
     
     const todoId = uuid.v4()
+    const attachmentUrl = 'https://${bucketName}.s3.amazonaws.com/${todoId}'
     const createdAt = new Date().toISOString()
+
     const newTodoItem = {
         userId,
         todoId,
+        attachmentUrl,
         createdAt,
         done: false,
         ...createTodoRequest

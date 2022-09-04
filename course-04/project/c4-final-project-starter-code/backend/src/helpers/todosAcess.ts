@@ -1,21 +1,19 @@
 import * as AWS from 'aws-sdk'
-import * as AWSXRay from 'aws-xray-sdk'
+// import * as AWSXRay from 'aws-xray-sdk'
 import { DocumentClient } from 'aws-sdk/clients/dynamodb'
 import { createLogger } from '../utils/logger'
 import { TodoItem } from '../models/TodoItem'
 import { TodoUpdate } from '../models/TodoUpdate';
 
-const XAWS = AWSXRay.captureAWS(AWS)
+// const XAWS = AWSXRay.captureAWS(AWS)
 
 const logger = createLogger('TodosAccess')
 
 // TODO: Implement the dataLayer logic
 export class TodosAccess {
     constructor(
-        private readonly docClient: DocumentClient = new XAWS.DynamoDB.DocumentClient(),
-        // private readonly s3Client: Types = new XAWS.S3({ signatureVersion: 'v4' }),
+        private readonly docClient: DocumentClient = new AWS.DynamoDB.DocumentClient(),
         private readonly todosTable = process.env.TODOS_TABLE,
-        // private readonly s3BucketName = process.env.S3_BUCKET_NAME
     ) {
     }
 
@@ -30,7 +28,7 @@ export class TodosAccess {
             ScanIndexForward: false
         }).promise()
       
-        const todos = result.items
+        const todos = result.Items
 
         return todos as TodoItem[];
 
@@ -42,6 +40,7 @@ export class TodosAccess {
         Item: todoItem
       }).promise();
 
+    logger.info("Todo successfully created.", todoItem)
     return todoItem
   }
 
@@ -62,6 +61,9 @@ export class TodosAccess {
           '#n': 'name'
         }
       }).promise();
+
+    logger.info("Todo has been updated successfully.")
+    return updatedTodo
   }
 
   async deleteTodoItem(userId: string, todoId: string) {
@@ -72,6 +74,8 @@ export class TodosAccess {
           todoId: todoId
         }
       }).promise();
+
+    logger.info("Todo has been deleted successfully.")
   }
  
 

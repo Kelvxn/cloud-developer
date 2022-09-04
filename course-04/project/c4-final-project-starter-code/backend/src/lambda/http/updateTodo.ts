@@ -19,7 +19,7 @@ export const handler = middy(
 
     return {
       statusCode: 201,
-      header: {
+      headers: {
         'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({
