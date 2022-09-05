@@ -22,7 +22,10 @@ export class TodosAccess {
 
         const result = await this.docClient.query({
             TableName: this.todosTable,
-            KeyConditionExpression: 'userId = :userId',
+            KeyConditionExpression: '#userId = :userId',
+            ExpressionAttributeNames: {
+              "#userId": "userId"
+            },
             ExpressionAttributeValues: {
               ':userId': userId
             },
@@ -36,17 +39,20 @@ export class TodosAccess {
     }
 
   async createTodoItem(todoItem: TodoItem): Promise<TodoItem> {
-    await this.docClient.put({
+
+    const result = await this.docClient.put({
         TableName: this.todosTable,
         Item: todoItem
       }).promise();
 
+    console.log(result)
+
     logger.info("Todo successfully created.", todoItem)
-    return todoItem
+    return todoItem as TodoItem;
   }
 
   async updateTodoItem(userId: string, todoId: string, updatedTodo: TodoUpdate) {
-    await this.docClient.update({
+    const result = await this.docClient.update({
         TableName: this.todosTable,
         Key: {
           userId: userId,
@@ -63,8 +69,10 @@ export class TodosAccess {
         }
       }).promise();
 
+    const attributes = result.Attributes;
+
     logger.info("Todo has been updated successfully.")
-    return updatedTodo
+    return attributes as TodoUpdate;
   }
 
   async deleteTodoItem(userId: string, todoId: string) {

@@ -28,7 +28,6 @@ provider:
   # ${self:provider.environment.ATTACHMENT_S3_BUCKET}
   environment:
     TODOS_TABLE: Todos-${self:provider.stage}
-    TODOS_CREATED_AT_INDEX: CreatedAtIndex
     ATTACHMENT_S3_BUCKET: serverless-todo-xd-bucket-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
 
@@ -102,7 +101,7 @@ functions:
             summary: Create a todo 
             description: Create a new todo item
             requestModels:
-              'application/json': createTodoRequest
+              "application/json": createTodoRequest
           reqValidatorName: RequestBodyValidator
     iamRoleStatements:
       - Effect: Allow
@@ -129,7 +128,7 @@ functions:
             summary: Update a todo 
             description: Update a todo item
             requestModels:
-              'application/json': updateTodoRequest
+              "application/json": updateTodoRequest
           reqValidatorName: RequestBodyValidator
     iamRoleStatements:
       - Effect: Allow
@@ -213,8 +212,8 @@ resources:
           - AttributeName: todoId
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
-
-
+       
+  
     RequestBodyValidator:
       Type: AWS::ApiGateway::RequestValidator
       Properties:
@@ -232,8 +231,7 @@ resources:
         BucketName: ${self:provider.environment.ATTACHMENT_S3_BUCKET}
         CorsConfiguration:
           CorsRules:
-            - 
-              AllowedOrigins:
+            - AllowedOrigins:
                 - '*'
               AllowedHeaders:
                 - '*'
