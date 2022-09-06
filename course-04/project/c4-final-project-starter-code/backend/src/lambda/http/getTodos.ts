@@ -4,7 +4,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import * as middy from 'middy'
 import { cors, httpErrorHandler } from 'middy/middlewares'
 
-import { getTodosForUser as getTodosForUser } from '../../businessLogic/todos'
+import { getTodosForUser } from '../../businessLogic/todos'
 import { getUserId } from '../utils';
 
 
@@ -14,8 +14,9 @@ export const handler = middy(
     // Write your code here
     console.log('Processing event', event);
 
-    const userId =  getUserId(event)
-    const user_todos = await getTodosForUser(userId)
+    const userId = getUserId(event)
+   
+    const todos = await getTodosForUser(userId)
 
     return {
       statusCode: 200, 
@@ -23,7 +24,7 @@ export const handler = middy(
         'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({
-        "todos": user_todos
+        Items: todos
       })
     }
   }

@@ -28,6 +28,7 @@ provider:
   # ${self:provider.environment.ATTACHMENT_S3_BUCKET}
   environment:
     TODOS_TABLE: Todos-${self:provider.stage}
+    TODOS_CREATED_AT_INDEX: createdAtIndex
     ATTACHMENT_S3_BUCKET: serverless-todo-xd-bucket-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
 
@@ -73,7 +74,7 @@ functions:
           method: get
           path: todos
           cors: true
-          authorizer: Auth
+          authorizer: Auth  
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -133,7 +134,8 @@ functions:
     iamRoleStatements:
       - Effect: Allow
         Action:
-          - dynamodb:PutItem
+          - dynamodb:GetItem
+          - dynamodb:UpdateItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
       - Effect: Allow
         Action:
@@ -153,6 +155,7 @@ functions:
     iamRoleStatements:
       - Effect: Allow
         Action:
+          - dynamodb:GetItem
           - dynamodb:DeleteItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
       - Effect: Allow
@@ -172,6 +175,11 @@ functions:
           cors: true
           authorizer: Auth
     iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:GetItem
+          - dynamodb:UpdateItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
       - Effect: Allow
         Action: 
           - xray:PutTraceSegments
@@ -200,18 +208,29 @@ resources:
     TodosTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:provider.environment.TODOS_TABLE}
         AttributeDefinitions:
           - AttributeName: userId
             AttributeType: S
           - AttributeName: todoId
+            AttributeType: S
+          - AttributeName: createdAt
             AttributeType: S
         KeySchema:
           - AttributeName: userId
             KeyType: HASH
           - AttributeName: todoId
             KeyType: RANGE
+        LocalSecondaryIndexes:
+          - IndexName: ${self:provider.environment.TODOS_CREATED_AT_INDEX}
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
         BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.TODOS_TABLE}
        
   
     RequestBodyValidator:

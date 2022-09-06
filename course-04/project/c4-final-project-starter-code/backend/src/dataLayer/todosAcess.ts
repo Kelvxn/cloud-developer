@@ -15,6 +15,7 @@ export class TodosAccess {
     constructor(
         private readonly docClient: DocumentClient = new XAWS.DynamoDB.DocumentClient(),
         private readonly todosTable = process.env.TODOS_TABLE,
+        private readonly index = process.env.TODOS_CREATED_AT_INDEX,
     ) {
     }
 
@@ -22,20 +23,19 @@ export class TodosAccess {
 
         const result = await this.docClient.query({
             TableName: this.todosTable,
-            KeyConditionExpression: '#userId = :userId',
+            IndexName: this.index,
+            KeyConditionExpression: 'userId = :userId',
             ExpressionAttributeNames: {
-              "#userId": "userId"
+              'userId': 'userId'
             },
             ExpressionAttributeValues: {
               ':userId': userId
-            },
-            ScanIndexForward: false
+            }
         }).promise()
       
         const todos = result.Items
 
         return todos as TodoItem[];
-
     }
 
   async createTodoItem(todoItem: TodoItem): Promise<TodoItem> {
@@ -58,14 +58,14 @@ export class TodosAccess {
           userId: userId,
           todoId: todoId
         },
-        UpdateExpression: 'SET #n = :name, dueDate = :dueDate, done = :done',
+        UpdateExpression: 'SET #name = :name, dueDate = :dueDate, done = :done',
+        ExpressionAttributeNames: {
+          '#nname': 'name'
+        },
         ExpressionAttributeValues : {
           ':name': updatedTodo.name,
           ':dueDate': updatedTodo.dueDate,
           ':done': updatedTodo.done
-        },
-        ExpressionAttributeNames: {
-          '#n': 'name'
         }
       }).promise();
 
